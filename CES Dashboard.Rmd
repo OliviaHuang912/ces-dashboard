@@ -32,6 +32,7 @@ row
 3. Data description: 
 - The data was collected through clinical trial. 
 - Participants were randomized into TRUE CES treatment (N=24) or SHAM placebo (N=23) groups.
+GitHub: https://github.com/OliviaHuang912/ces-dashboard
 
 row
 -----------------------------------------------
