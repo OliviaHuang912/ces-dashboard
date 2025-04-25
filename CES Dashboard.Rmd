@@ -1,0 +1,145 @@
+---
+title: "Interactive Visualizations - Widgets"
+author: "ChiaoYu Huang"
+
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r message=FALSE, echo=FALSE}
+# Load required libraries
+library(ggplot2)
+library(plotly)
+library(dplyr)
+library(readxl)
+library(forcats)
+library(flexdashboard)
+
+```
+
+Dataset Description
+====================================================================
+
+row
+-----------------------------------------------
+
+### Data Source Information
+
+1. Data is confidential and was collected through the VA Office of Research and Development. 
+2. Sample size: 50 participants enrolled, and 47 veterans randomized after screening. 
+3. Data description: 
+- The data was collected through clinical trial. 
+- Participants were randomized into TRUE CES treatment (N=24) or SHAM placebo (N=23) groups.
+
+row
+-----------------------------------------------
+
+### Impact and Importance
+This dashboard provides a visual summary of the effects of Cranial Electrotherapy Stimulation on pain and sleep outcomes among veterans, informing clinical decision-making and supporting the use of CES as a non-invasive therapy option.
+
+Pain Score
+====================================================================
+
+
+### Scatterplot
+
+```{r message=FALSE, echo=FALSE, warning=FALSE, fig.width= 15 , fig.height= 20}
+# Scatterplot: Usage Time vs. Change in Pain Score
+## ---- Scatterplot: Usage Time vs. DVPRS Score Change ----
+ces_filtered <- read_xlsx("Data/ces_filtered.xlsx")
+
+# Change Group labels
+ces_filtered <- ces_filtered %>%
+  mutate(Group = fct_recode(Group,
+                            "Active CES (Alpha-Stim)" = "TRUE",
+                            "Sham CES (No Stimulation)" = "SHAM"))
+
+#### DVPRS difference #####
+ces_filtered <- ces_filtered %>%
+  group_by(ID) %>%
+  mutate(DVPRS6 = DVPRS[Timepoint == 2] - DVPRS[Timepoint == 1],
+         DVPRS12 = DVPRS[Timepoint == 3] - DVPRS[Timepoint == 1]) %>%
+  ungroup()
+
+# create a scatter plot
+scatter_plot <- ggplot(ces_filtered, aes(x = Usage_Time_hrs, y = DVPRS12, color = Group)) +
+  geom_point(aes(text = paste("Group:", Group,  # Creates a tooltip with detailed info
+                              "<br>Total Usage Time (hour): ", round(Usage_Time_hrs, 2),
+                              "<br>Pain Score Change (12 weeks - Baseline): ", DVPRS12)), 
+             size = 2, alpha = 0.5) + 
+  geom_smooth(method = "lm", se = FALSE, linetype = "solid") +  # Regression trend line
+  labs(
+    title = "Usage Time vs. Pain Score Change (12 weeks – Baseline)",
+    x = "Total Device Usage Time (hours over 12 weeks)",
+    y = "Change in Pain Score"
+  ) +
+  theme_minimal()
+
+# Convert to interactive Plotly plot
+ggplotly(scatter_plot, tooltip = "text") #tooltip = "text" is how you ensure your hoverbox shows up
+
+```
+
+
+### Key Takeaways from Scatterplot:
+
+1. The Sham CES (No Stimulation) group appears to have a negative trend, suggesting that higher usage may be associated with a greater reduction in pain.
+
+2. The Active CES (Alpha-Stim) group (blue) shows a slight positive trend, indicating that increased usage does not consistently lead to a larger reduction in pain scores.
+
+3. The change in pain score does not show a strong correlation with total device usage time for either group.
+
+
+Sleep Quality
+====================================================================
+
+
+### Boxplot: Sleep Quality by Group and Time Point
+
+
+```{r message=FALSE, echo=FALSE, warning=FALSE, fig.width= 15 , fig.height= 20}
+## ---- Boxplot: Sleep Quality by Group and Time Point ----
+final_slp_data <- read_xlsx("Data/final_slp_data.xlsx")
+
+# Change Group labels
+final_slp_data <- final_slp_data %>%
+  mutate(Group = fct_recode(Group.x,
+                            "Active CES (Alpha-Stim)" = "TRUE",
+                            "Sham CES (No Stimulation)" = "SHAM"),
+         Timepoint = factor(Timepoint, levels = unique(Timepoint), labels = c("1", "2", "3")))
+
+# Create the boxplot
+boxplot <- ggplot(final_slp_data, aes(x = Timepoint, y = t_score, fill = Group)) +
+  geom_boxplot(outlier.shape = 8, outlier.size = 3, alpha = 0.6) +
+  geom_jitter(aes(text = paste("Group:", Group, 
+                               "<br>Time Point:", Timepoint, 
+                               "<br>Sleep Quality T-score:", round(t_score, 2))), 
+              width = 0.15, size = 2, alpha = 0.7) +
+  labs(
+    title = "Sleep Quality by Group and Time Point",
+    x = "Time Point",
+    y = "Sleep Quality T-score"
+  ) +
+  theme_minimal()
+
+# Convert to interactive Plotly plot
+ggplotly(boxplot, tooltip = "text") #tooltip = "text" is how you ensure your hoverbox shows up
+
+```
+
+
+### Key Takeaways from Box Plot:
+
+
+1. We can find that there are two notable outliers observed at time point 2:
+  * One from the Sham CES group with a t-score of 77.5.
+  * One from the Active CES group with a t-score of 46.7.
+
+2. Lower sleep quality t-score indicates better sleep quality. The Active CES group shows a decreasing median T-score, indicating improved sleep quality (T1: 61, T2: 59.55, T3: 57.20).
+
+3. Within the Sham CES group, the median t-score shows a decreasing trend (T1: 62, T2: 58.15, T3: 58.10). Additionally, at time points 1 and 3, the median sleep quality t-score is higher in the Sham CES group than in the Active CES group. However, the Active CES group demonstrates greater improvement in sleep quality compared to the Sham CES group.
+
+
