@@ -2,10 +2,11 @@
 title: "Interactive Visualizations - Widgets"
 author: "ChiaoYu Huang"
 
-output: 
+output:
   flexdashboard::flex_dashboard:
     orientation: rows
     vertical_layout: fill
+    
 ---
 
 ```{r message=FALSE, echo=FALSE}
@@ -31,7 +32,12 @@ row
 2. Sample size: 50 participants enrolled, and 47 veterans randomized after screening. 
 3. Data description: 
 - The data was collected through clinical trial. 
-- Participants were randomized into TRUE CES treatment (N=24) or SHAM placebo (N=23) groups.
+- Participants were randomized into TRUE CES treatment (N=24) or SHAM placebo (N=23) groups and assessed the measurement at baseline, 6 weeks and 12 weeks. 
+- Outcome Variables:
+  * Pain levels (Defense and Veterans Pain Rating Scale, DVPRS): the measurement of pain scale ranging from 0 to 10 (0 represents "no pain" and 10 represents "severe" or "worst pain").
+
+  * Sleep quality (PROMIS t-scores): The questions include Pain, Cognition Function, Sleep, Fatigue, Physical Function, Overall Global Health, Emotional Distress served as supplement. Lower t-score represents better sleep quality. 
+
 GitHub: https://github.com/OliviaHuang912/ces-dashboard
 
 row
