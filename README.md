@@ -27,7 +27,7 @@ This flexdashboard includes:
 This dashboard provides a visual summary of the effects of Cranial Electrotherapy Stimulation on pain and sleep outcomes among veterans. These findings may inform clinical decision-making and support the use of CES as a non-invasive therapy option.
 
 ## View Dashboard
-
+https://github.com/OliviaHuang912/ces-dashboard
 
 
 
